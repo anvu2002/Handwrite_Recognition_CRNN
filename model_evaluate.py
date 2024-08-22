@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 import pandas as pd
 import matplotlib.pyplot as plt
+from loguru import logger
 
 
 
@@ -39,7 +40,7 @@ def preprocess_input(img_list, n_img):
     plt.figure(figsize=(15, 10))
     for i in range(n_img):
         # ax = plt.subplot(2, 3, i+1)
-        img_dir = './kaggle/input/handwriting-recognition/test_v2/test/'+img_list.loc[i, 'FILENAME']
+        img_dir = './data/test/test_v2/test_imgs/'+img_list.loc[i, 'FILENAME']
 
         image = cv2.imread(img_dir, cv2.IMREAD_GRAYSCALE)
         plt.imshow(image, cmap='gray')
@@ -80,13 +81,13 @@ def evaluate(img_list, n_img, predicted_result):
         
         true_result.append(tr)
     
-    print('Correct characters predicted : %.2f%%' %(correct_char*100/total_char))
-    print('Correct words predicted      : %.2f%%' %(correct*100/n_img))
-    print('True Results = ', true_result)
+    logger.info('Correct characters predicted : %.2f%%' %(correct_char*100/total_char))
+    logger.info('Correct words predicted      : %.2f%%' %(correct*100/n_img))
+    logger.info(f'\nTrue Results = {true_result}')
 
 
 model = load_model("./trained_models/CRNN_Handwrite_model.keras")
-img_list = pd.read_csv('./kaggle/input/handwriting-recognition/written_name_test_v2.csv')
+img_list = pd.read_csv('./data/test/test_v2/written_name_test_v2.csv')
 
 input_set = preprocess_input(img_list, 10)
 
@@ -95,7 +96,7 @@ pred = model.predict(np.array(input_set).reshape(-1, 256, 64, 1))
 result = prepare_prediction(pred,10)
 
    
-print(result)
+logger.info(f"Predict Words = {result}")
 
 evaluate(img_list, 10, result)
 
