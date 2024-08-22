@@ -13,7 +13,7 @@ services:
       - "6379:6379"
 
   worker:
-    container_name: worker
+    container_name: celery_worker
     build:
       dockerfile: api/Dockerfile
       context: .

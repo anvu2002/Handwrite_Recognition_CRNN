@@ -71,6 +71,7 @@ async def process(files: List[UploadFile] = File(...)):
         return JSONResponse(status_code=400, content=[])
 
 
+
 @app.get('/api/result/{task_id}', response_model=Prediction)
 async def result(task_id: str):
     task = AsyncResult(task_id)

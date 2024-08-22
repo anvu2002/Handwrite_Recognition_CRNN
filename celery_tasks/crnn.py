@@ -37,18 +37,15 @@ class CRNN_Model:
                 ret+=alphabets[ch]
         return ret
 
-    def preprocess_input(self, img_list:pd.DataFrame, img_folder:str, n_img:int):
+    def preprocess_input(self, img_path:str):
         img_set = []
+        #  img_path = img_folder + img_list.loc[i, 'FILENAME']
+        
+        image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
 
-        for i in range(n_img):
-            # img_dir = './data/test/test_v2/test_imgs/'+img_list.loc[i, 'FILENAME']
-            img_path = img_folder + img_list.loc[i, 'FILENAME']
-            image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-            plt.imshow(image, cmap='gray')
-
-            image = self.preprocess_img(image)
-            image = image/255.
-            img_set.append(image)
+        image = self.preprocess_img(image)
+        image = image/255.
+        img_set.append(image)
 
         return img_set
     
@@ -88,10 +85,10 @@ class CRNN_Model:
         logger.info(f'\nTrue Results = {true_result}')
 
 
-    def words_predict(self,img_list:pd.DataFrame, img_folder:str, n_imgs:int):
+    def words_predict(self,img_path:str):
         try:
            
-            input_set = self.preprocess_input(img_list, img_folder, n_imgs)
+            input_set = self.preprocess_input(img_path)
 
             pred = self.model.predict(np.array(input_set).reshape(-1, 256, 64, 1))
             
