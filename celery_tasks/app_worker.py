@@ -10,3 +10,5 @@ app = Celery(
     backend=BACKEND_URI,
     include=['celery_tasks.tasks']
 )
+
+print("hi")
