@@ -1,3 +1,6 @@
+version: '3.8'
+
+
 services:  
   rabbitmq:
     container_name: rabbitmq
@@ -5,14 +8,30 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+    networks:
+      - crnn-network
   
   redis:
     container_name: redis                                                            
     image: redis
     ports:
       - "6379:6379"
+    networks:
+      - crnn-network
 
-  # Handle API Calls
+  webapp:
+    container_name: crnn-webapp
+    build: 
+      dockerfile: webapp/Dockerfile
+      context: .
+    command: sh -c "cd /app && uvicorn app:app --host 0.0.0.0 --port 80 --reload"
+    volumes:
+      - ./webapp:/app
+    ports:
+      - "5555:80"
+    networks:
+      - crnn-network
+
   # worker:
   #   container_name: crnn-worker
   #   build:
@@ -23,15 +42,9 @@ services:
   #     - .:/app
   #   ports:
   #     - "7777:7777"
+  #   networks:
+  #     - crnn-network
 
-  webapp:
-    container_name: crnn-webapp
-    build: 
-      dockerfile: webapp/Dockerfile
-      context: .
-    command: sh -c "cd /app && uvicorn app:app --host 0.0.0.0 --port 80 --reload"
-    volumes:
-      - ./webapp:/app
-
-    ports:
-      - "5555:80"
+networks:
+  crnn-network:
+    driver: bridge
