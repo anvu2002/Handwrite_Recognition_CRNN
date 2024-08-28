@@ -46,7 +46,7 @@ class PredictWordsTask(Task):
 @app.task(ignore_result=False, bind=True, base=PredictWordsTask)
 def dectect_words(self, data):
     try:
-        predicted_words = self.model.words_predict(data["img_list"], data["img_folder"], data["n_imgs"])
+        predicted_words = self.model.words_predict(data["img_path"])
         return {'status': 'SUCCESS', 'result': predicted_words}
     except Exception as ex:
         try:

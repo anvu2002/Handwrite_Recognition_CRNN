@@ -18,7 +18,7 @@ services:
   #   build:
   #     dockerfile: api/Dockerfile
   #     context: .
-  #   command: sh -c "cd api && uvicorn app:app --host 0.0.0.0 --port 7777 & cd ../ & celery -A celery_tasks.app_worker worker -l INFO --pool=solo"
+  #   command: sh -c "cd api && uvicorn app:app --host 0.0.0.0 --port 7777 --reload & cd ../ & celery -A celery_tasks.app_worker worker -l INFO --pool=solo"
   #   volumes:
   #     - .:/app
   #   ports:

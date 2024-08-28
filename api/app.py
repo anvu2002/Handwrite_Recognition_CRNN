@@ -25,10 +25,7 @@ isdir = os.path.isdir(STATIC_FOLDER)
 if not isdir:
     os.makedirs(STATIC_FOLDER)
 
-origins = [
-    "http://localhost",
-    "http://localhost:8080",
-]
+origins = ["*"]
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=STATIC_FOLDER), name="static")
@@ -41,7 +38,7 @@ app.add_middleware(
 )
 
 
-# @app.post('/api/process_object')
+# @app.post('/api/process')
 # async def process(files: list[UploadFile] = File(...)):
 #     tasks = []
 #     try:
@@ -127,3 +124,7 @@ async def result(task_id: str):
 async def status(task_id: str):
     task = AsyncResult(task_id)
     return JSONResponse(status_code=200, content={'task_id': str(task_id), 'status': task.status, 'result': ''})
+
+@app.get('/api/health')
+async def health():
+    return JSONResponse(status_code=200, content={'server':'crnn_worker','status':'HEALTHY'})

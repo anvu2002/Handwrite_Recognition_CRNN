@@ -100,7 +100,8 @@ class CRNN_Model:
             
             result = self.prepare_prediction(pred)
 
-            logger.debug(f"Predicted Handwrite = {result}")
+            logger.debug(f"Received Image: {img_path}")
+            logger.debug(f"Predicted Handwriten Words = {result}")
             return {"predicted_words": result}
             
         except Exception as ex:
