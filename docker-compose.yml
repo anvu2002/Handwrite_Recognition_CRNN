@@ -12,22 +12,25 @@ services:
     ports:
       - "6379:6379"
 
-  worker:
-    container_name: worker
-    build:
-      dockerfile: api/Dockerfile
-      context: .
-    command: sh -c "cd api && uvicorn app:app --host 0.0.0.0 --port 8000 & cd ../ & celery -A celery_tasks.app_worker worker -l INFO --pool=solo"
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
+  # worker:
+  #   container_name: worker
+  #   build:
+  #     dockerfile: api/Dockerfile
+  #     context: .
+  #   command: sh -c "cd api && uvicorn app:app --host 0.0.0.0 --port 8000 & cd ../ & celery -A celery_tasks.app_worker worker -l INFO --pool=solo"
+  #   volumes:
+  #     - .:/app
+  #   ports:
+  #     - "8000:8000"
 
   webapp:
-    container_name: webapp
+    container_name: crnn-webapp
     build: 
       dockerfile: webapp/Dockerfile
       context: .
     command: sh -c "cd /app && uvicorn app:app --host 0.0.0.0 --port 80 --reload"
+    volumes:
+      - /webapp:/app
+
     ports:
       - "80:80"

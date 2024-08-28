@@ -40,7 +40,7 @@ def preprocess_input(img_list, n_img):
     plt.figure(figsize=(15, 10))
     for i in range(n_img):
         # ax = plt.subplot(2, 3, i+1)
-        img_dir = './data/test/test_v2/test_imgs/'+img_list.loc[i, 'FILENAME']
+        img_dir = './data/test/test_imgs/test/'+img_list.loc[i, 'FILENAME']
 
         image = cv2.imread(img_dir, cv2.IMREAD_GRAYSCALE)
         plt.imshow(image, cmap='gray')
@@ -87,7 +87,7 @@ def evaluate(img_list, n_img, predicted_result):
 
 
 model = load_model("./celery_tasks/trained_models/CRNN_Handwrite_model.keras")
-img_list = pd.read_csv('./data/test/test_v2/written_name_test_v2.csv')
+img_list = pd.read_csv('./data/test/written_name_test_v2.csv')
 
 input_set = preprocess_input(img_list, 10)
 

@@ -41,27 +41,29 @@ class CRNN_Model:
                 ret+=alphabets[ch]
         return ret
 
-    def preprocess_input(self, img_path:str):
+    def preprocess_input(self,  img_folder:str, n_img:int):
         img_set = []
 
-        
-        image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-        plt.imshow(image, cmap='gray')
+        for i in range(n_img):
+            # img_dir = './data/test/test_v2/test_imgs/'+img_list.loc[i, 'FILENAME']
+            # img_path = img_folder + img_list.loc[i, 'FILENAME']
+            img_path = img_folder
+            image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+            plt.imshow(image, cmap='gray')
 
-        image = self.preprocess_img(image)
-        image = image/255.
-        img_set.append(image)
+            image = self.preprocess_img(image)
+            image = image/255.
+            img_set.append(image)
 
         return img_set
     
-    def prepare_prediction(self, pred):
+    def prepare_prediction(self, pred, n_img):
         # Decode the predictions
         decoded = ctc_decode(pred, input_length=np.ones(pred.shape[0]) * pred.shape[1], greedy=True)[0][0]
         # Convert the decoded predictions to numpy array
         decoded = get_value(decoded)
 
-        res = [ self.num_to_label(decoded[i]) for i in range(1)]
-
+        res = [ self.num_to_label(decoded[i]) for i in range(n_img)]
         return res
 
     def evaluate(img_list, n_img, predicted_result):
@@ -91,14 +93,14 @@ class CRNN_Model:
         logger.info(f'\nTrue Results = {true_result}')
 
 
-    def words_predict(self,img_path:str):
+    def words_predict(self,img_folder:str, n_imgs:int):
         try:
            
-            input_set = self.preprocess_input(img_path)
+            input_set = self.preprocess_input(img_folder, n_imgs)
 
             pred = self.model.predict(np.array(input_set).reshape(-1, 256, 64, 1))
             
-            result = self.prepare_prediction(pred)
+            result = self.prepare_prediction(pred,10)
 
             logger.debug(f"Predicted Handwrite = {result}")
             return {"predicted_words": result}

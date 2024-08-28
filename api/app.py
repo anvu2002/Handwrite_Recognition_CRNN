@@ -5,13 +5,14 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from celery_tasks.tasks import predict_image
+# from celery_tasks.tasks import predict_image
+from celery_tasks.tasks import dectect_words
 from celery.result import AsyncResult
 from models import Task, Prediction
 import uuid
 import logging
-from pydantic.typing import List
-import numpy as np
+# from pydantic.typing import List
+from loguru import logger
 
 UPLOAD_FOLDER = 'uploads'
 STATIC_FOLDER = 'static/results'
@@ -23,6 +24,8 @@ if not isdir:
 isdir = os.path.isdir(STATIC_FOLDER)
 if not isdir:
     os.makedirs(STATIC_FOLDER)
+
+breakpoint()
 
 origins = [
     "http://localhost",
@@ -40,13 +43,45 @@ app.add_middleware(
 )
 
 
-@app.post('/api/process')
-async def process(files: List[UploadFile] = File(...)):
+# @app.post('/api/process_object')
+# async def process(files: list[UploadFile] = File(...)):
+#     tasks = []
+#     try:
+#         for file in files:
+#             d = {}
+#             try:
+#                 name = str(uuid.uuid4()).split('-')[0]
+#                 ext = file.filename.split('.')[-1]
+#                 file_name = f'{UPLOAD_FOLDER}/{name}.{ext}'
+#                 with open(file_name, 'wb+') as f:
+#                     f.write(file.file.read())
+#                 f.close()
+
+#                 # start task prediction
+#                 task_id = predict_image.delay(os.path.join('api', file_name))
+#                 d['task_id'] = str(task_id)
+#                 d['status'] = 'PROCESSING'
+#                 d['url_result'] = f'/api/result/{task_id}'
+#             except Exception as ex:
+#                 logging.info(ex)
+#                 d['task_id'] = str(task_id)
+#                 d['status'] = 'ERROR'
+#                 d['url_result'] = ''
+#             tasks.append(d)
+#         return JSONResponse(status_code=202, content=tasks)
+#     except Exception as ex:
+#         logging.info(ex)
+#         return JSONResponse(status_code=400, content=[])
+
+
+@app.post('/api/detect_words')
+async def process(files: list[UploadFile] = File(...)):
     tasks = []
     try:
         for file in files:
             d = {}
             try:
+                # save uploaded files
                 name = str(uuid.uuid4()).split('-')[0]
                 ext = file.filename.split('.')[-1]
                 file_name = f'{UPLOAD_FOLDER}/{name}.{ext}'
@@ -54,8 +89,11 @@ async def process(files: List[UploadFile] = File(...)):
                     f.write(file.file.read())
                 f.close()
 
-                # start task prediction
-                task_id = predict_image.delay(os.path.join('api', file_name))
+                # start word prediction
+                data = {}
+                data.update({"img_path"})
+                logger.debug("Request CRNN")
+                task_id = dectect_words.delay(os.path.join('api', file_name))
                 d['task_id'] = str(task_id)
                 d['status'] = 'PROCESSING'
                 d['url_result'] = f'/api/result/{task_id}'
@@ -65,10 +103,12 @@ async def process(files: List[UploadFile] = File(...)):
                 d['status'] = 'ERROR'
                 d['url_result'] = ''
             tasks.append(d)
+
         return JSONResponse(status_code=202, content=tasks)
     except Exception as ex:
         logging.info(ex)
         return JSONResponse(status_code=400, content=[])
+
 
 
 @app.get('/api/result/{task_id}', response_model=Prediction)
