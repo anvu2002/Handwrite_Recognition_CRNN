@@ -12,16 +12,17 @@ services:
     ports:
       - "6379:6379"
 
+  # Handle API Calls
   # worker:
-  #   container_name: worker
+  #   container_name: crnn-worker
   #   build:
   #     dockerfile: api/Dockerfile
   #     context: .
-  #   command: sh -c "cd api && uvicorn app:app --host 0.0.0.0 --port 8000 & cd ../ & celery -A celery_tasks.app_worker worker -l INFO --pool=solo"
+  #   command: sh -c "cd api && uvicorn app:app --host 0.0.0.0 --port 7777 & cd ../ & celery -A celery_tasks.app_worker worker -l INFO --pool=solo"
   #   volumes:
   #     - .:/app
   #   ports:
-  #     - "8000:8000"
+  #     - "7777:7777"
 
   webapp:
     container_name: crnn-webapp
@@ -30,7 +31,7 @@ services:
       context: .
     command: sh -c "cd /app && uvicorn app:app --host 0.0.0.0 --port 80 --reload"
     volumes:
-      - /webapp:/app
+      - ./webapp:/app
 
     ports:
-      - "80:80"
+      - "5555:80"

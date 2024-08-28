@@ -25,8 +25,6 @@ isdir = os.path.isdir(STATIC_FOLDER)
 if not isdir:
     os.makedirs(STATIC_FOLDER)
 
-breakpoint()
-
 origins = [
     "http://localhost",
     "http://localhost:8080",

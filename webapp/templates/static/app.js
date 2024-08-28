@@ -1,5 +1,5 @@
-var URL = 'http://localhost:8888'
-var URL_STATUS = 'http://localhost:8888/api/status/'
+var URL = 'http://localhost:7777'
+var URL_STATUS = 'http://localhost:7777/api/status/'
 var results = []
 var status_list = []
 var res = ''
