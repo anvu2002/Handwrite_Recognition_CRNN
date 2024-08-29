@@ -93,6 +93,7 @@ class CRNN_Model:
 
     def words_predict(self,img_path:str):
         try:
+            logger.debug(f"[*] Processing Image: {img_path}")
            
             input_set = self.preprocess_input(img_path)
 
@@ -100,7 +101,7 @@ class CRNN_Model:
             
             result = self.prepare_prediction(pred)
 
-            logger.debug(f"Received Image: {img_path}")
+            
             logger.debug(f"Predicted Handwriten Words = {result}")
             return {"predicted_words": result}
             

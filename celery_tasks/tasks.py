@@ -46,10 +46,11 @@ class PredictWordsTask(Task):
 @app.task(ignore_result=False, bind=True, base=PredictWordsTask)
 def dectect_words(self, data):
     try:
+        logger.debug("[*] Predicting words ...")
         predicted_words = self.model.words_predict(data["img_path"])
         return {'status': 'SUCCESS', 'result': predicted_words}
     except Exception as ex:
         try:
             self.retry(countdown=2)
         except MaxRetriesExceededError as ex:
-            return {'status': 'FAIL', 'result': 'max retried achieved'}
+            return {'status': 'FAIL', 'result': 'max retried achieved', 'error':ex}

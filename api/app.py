@@ -77,18 +77,28 @@ async def process(files: list[UploadFile] = File(...)):
             d = {}
             try:
                 # save uploaded files
-                name = str(uuid.uuid4()).split('-')[0]
-                ext = file.filename.split('.')[-1]
-                file_name = f'{UPLOAD_FOLDER}/{name}.{ext}'
-                with open(file_name, 'wb+') as f:
-                    f.write(file.file.read())
-                f.close()
+                try:
+                    contents = file.file.read()
+                    file_name = f'{UPLOAD_FOLDER}/{file.filename}'
+                    with open(file_name, 'wb') as f:
+                        f.write(contents)
+                except Exception:
+                    return {"message": "There was an error uploading the file(s)"}
+                finally:
+                    file.file.close()                
+                
+
+                logger.debug(f"Saved image -- {os.path.join('api', file_name)}")
+                logger.debug("Requesting CRNN ...")
+
 
                 # start word prediction
                 data = {}
-                data.update({"img_path"})
-                logger.debug("Request CRNN")
-                task_id = dectect_words.delay(os.path.join('api', file_name))
+                data.update({"img_path":os.path.join('api', file_name)})
+                
+
+                task_id = dectect_words.delay(data)
+                logger.debug(f"task_id = {task_id}")
                 d['task_id'] = str(task_id)
                 d['status'] = 'PROCESSING'
                 d['url_result'] = f'/api/result/{task_id}'
@@ -101,8 +111,8 @@ async def process(files: list[UploadFile] = File(...)):
 
         return JSONResponse(status_code=202, content=tasks)
     except Exception as ex:
-        logging.info(ex)
-        return JSONResponse(status_code=400, content=[])
+        logger.debug(f"PROCESSING ERROR: {ex}")
+        return JSONResponse(status_code=500, content=[])
 
 
 
@@ -128,3 +138,10 @@ async def status(task_id: str):
 @app.get('/api/health')
 async def health():
     return JSONResponse(status_code=200, content={'server':'crnn_worker','status':'HEALTHY'})
+
+@app.post("/files")
+async def UploadImage(file: bytes = File(...)):
+    with open('image.jpg','wb') as image:
+        image.write(file)
+        image.close()
+    return 'got it'

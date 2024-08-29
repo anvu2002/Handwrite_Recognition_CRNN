@@ -1,6 +1,6 @@
 // var URL = 'http://localhost:7777'
-var URL = 'http://172.17.0.8:7777'
-var URL_STATUS = 'http://172.17.0.8:7777/api/status/'
+var URL = 'http://10.147.19.160:7777'
+var URL_STATUS = 'http://10.147.19.160:7777/api/status/'
 var results = []
 var status_list = []
 var res = ''
@@ -14,7 +14,7 @@ jQuery(document).ready(function () {
         for (i = 0; i < files.length; i++)
             form_data.append('files', $('#input_file').prop('files')[i]);
 
-        console.log('Requesting CRNN at ',URL)
+        console.log('Requesting CRNN at NEW ',URL)
         $.ajax({
             url: URL + '/api/detect_words',
             type: "post",
