@@ -103,7 +103,7 @@ class CRNN_Model:
 
             
             logger.debug(f"Predicted Handwriten Words = {result}")
-            return {"predicted_words": result}
+            return {"predicted_words": result,"file_name" : img_path}
             
         except Exception as ex:
             logger.error(str(ex))

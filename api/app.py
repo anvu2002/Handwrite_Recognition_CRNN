@@ -29,6 +29,8 @@ origins = ["*"]
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=STATIC_FOLDER), name="static")
+app.mount("/api/uploads", StaticFiles(directory=UPLOAD_FOLDER), name="uploads")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

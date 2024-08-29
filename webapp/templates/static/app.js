@@ -77,7 +77,12 @@ jQuery(document).ready(function () {
             res = data
             if (data['status'] == 'SUCCESS') {
                 $('#row_detail').show()
-                $('#result_txt').val(JSON.stringify(res.result['bbox'], undefined, 4))
+                console.log("RES = ",res)
+                console.log("PREDICTED_WORDS = ", res.result['predicted_words'])
+                console.log("FILE PATH = ", res.result['file_name'])
+
+                $('#result_txt').val(JSON.stringify(res.result['predicted_words'], undefined, 4))
+
                 $('#result_img').attr('src', URL + '/' + res.result.file_name)
                 $('#result_link').attr('href', URL + '/' + res.result.file_name)
             } else {
