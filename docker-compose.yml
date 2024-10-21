@@ -1,0 +1,59 @@
+version: '3.8'
+
+
+services:  
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - crnn-network
+  
+  redis:
+    container_name: redis                                                            
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - crnn-network
+
+  webapp:
+    container_name: crnn-webapp
+    build: 
+      dockerfile: webapp/Dockerfile
+      context: .
+    command: sh -c "cd /app && uvicorn app:app --host 0.0.0.0 --port 4444 --reload"
+    volumes:
+      - ./webapp:/app
+    ports:
+      - "20000:4444"
+
+    networks:
+      - crnn-network
+
+  worker:
+    container_name: updated-crnn-worker
+    build: 
+      dockerfile: api/Dockerfile
+      context: .
+    volumes:
+      - .:/app
+    command: sh -c "cd api && uvicorn app:app --host 0.0.0.0 --port 7777 --reload & cd ../ & celery -A celery_tasks.app_worker worker -l INFO --pool=solo"
+
+    ports:
+      - "7777:7777"
+    networks:
+      - crnn-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all # alternatively, use `count: all` for all GPUs
+              capabilities: [gpu]
+
+networks:
+  crnn-network:
+    driver: bridge
