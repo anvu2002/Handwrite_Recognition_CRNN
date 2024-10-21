@@ -10,7 +10,9 @@ from os.path import join, dirname
 
 
 class CRNN_Model:
-    def __init__(self):
+    def __init__(self, gpu_id:str = "1"):
+        logger.debug(f"Running on GPU_ID = {gpu_id} ")
+        os.environ["CUDA_VISIBLE_DEVICES"] = gpu_id
         model_path = join(dirname(__file__), "trained_models/CRNN_Handwrite_model.keras")
         self.model = load_model(model_path)
     
