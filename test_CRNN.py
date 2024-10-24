@@ -10,7 +10,7 @@ import pandas as pd
 #2:0
 #3:2
 
-crnn_model = CRNN_Model(gpu_id="3")
+crnn_model = CRNN_Model(gpu_id="0")
 img_folder = 'data/test/test_imgs/test/'
 
 img_list = pd.read_csv('data/test/written_name_test_v2.csv')

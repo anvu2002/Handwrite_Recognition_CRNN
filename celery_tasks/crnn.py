@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.backend import ctc_decode, get_value
 import numpy as np
@@ -10,9 +11,28 @@ from os.path import join, dirname
 
 
 class CRNN_Model:
-    def __init__(self, gpu_id:str = "1"):
-        logger.debug(f"Running on GPU_ID = {gpu_id} ")
+    def __init__(self, gpu_id:str = "1", memory_limit: int = None):
+        logger.debug(f"[CRNN] Running on GPU_ID = {gpu_id} ")
         os.environ["CUDA_VISIBLE_DEVICES"] = gpu_id
+
+        # Enable memory growth or limit memory allocation
+        gpus = tf.config.experimental.list_physical_devices('GPU')
+        if gpus:
+            try:
+                # Check for memory limit
+                if memory_limit:
+                    logger.debug(f"Setting memory limit: {memory_limit} MB on GPU_ID = {gpu_id}")
+                    tf.config.experimental.set_virtual_device_configuration(
+                        gpus[0],
+                        [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=memory_limit)])
+                else:
+                    # Set memory growth to prevent occupying all GPU memory at once
+                    logger.debug(f"Enabling memory growth on GPU_ID = {gpu_id}")
+                    tf.config.experimental.set_memory_growth(gpus[0], True)
+            except RuntimeError as e:
+                logger.error(f"Error in setting memory growth or memory limit: {e}")
+        
+        # Load model
         model_path = join(dirname(__file__), "trained_models/CRNN_Handwrite_model.keras")
         self.model = load_model(model_path)
     

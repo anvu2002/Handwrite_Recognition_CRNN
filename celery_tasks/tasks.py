@@ -26,7 +26,7 @@ class PredictWordsTask(Task):
 
     def __call__(self, *args, **kwargs):
         if not self.model:
-            logger.info('Loading CRNN Model...')
+            logger.info('[Memmory Controlled] Loading CRNN Model...')
             self.model = CRNN_Model()
             logger.info('[+] CRNN Model loaded')
         return self.run(*args, **kwargs)
